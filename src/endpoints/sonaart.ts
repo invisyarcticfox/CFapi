@@ -1,5 +1,5 @@
 import { OpenAPIRoute, Arr } from 'chanfana';
-import { SonaArtSchema } from 'types';
+import { SonaArtSchema } from 'misc/types';
 import data from './json/sonaart.json';
 
 
@@ -19,7 +19,5 @@ export class SonaArtRoute extends OpenAPIRoute {
     },
   };
 
-  async handle(c) {
-    return data
-  }
+  async handle(c) { return data }
 }

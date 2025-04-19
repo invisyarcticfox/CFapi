@@ -1,15 +1,7 @@
 import { OpenAPIRoute, Str, Arr, Obj } from 'chanfana';
-import { GetRemindersSchema } from 'types';
+import { GetRemindersSchema } from 'misc/types';
+import { checkAuth, generateId } from 'misc/utils';
 
-
-function generateId() {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let id = '';
-  for (let i = 0; i < 8; i++) {
-    id += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return id;
-}
 
 export class GetRemindersRoute extends OpenAPIRoute {
   schema = {
@@ -28,9 +20,9 @@ export class GetRemindersRoute extends OpenAPIRoute {
   };
 
   async handle(c) {
-    const obj = await c.env.CDN.get('reminders.json')
-    const objRes = await obj.json()
-    return c.json(objRes)
+    const res = await c.env.CDN.get('reminders.json')
+    const data = await res.json()
+    return c.json(data)
   }
 }
 
@@ -84,12 +76,31 @@ export class AddReminderRoute extends OpenAPIRoute {
   };
 
   async handle(c) {
-    const data = await c.req.json()
-
     try {
-      return c.json({ data, id: generateId() })
+      if (!checkAuth(c)) {
+        return c.json({ error: 'unauthorized' }, 401)
+      }
+
+      const data = await c.req.json()
+  
+      if (!Array.isArray(data)) {
+        return c.json({ error: 'Expected an array in the request body' }, 400)
+      }
+  
+      const result = data.map(item => ({
+        ...item,
+        id: generateId()
+      }))
+      
+      await c.env.CDN.put('reminders.json', JSON.stringify(result), {
+        httpMetadata: {
+          contentType: 'application/json'
+        }
+      })
+      
+      return c.json({ success: true, msg: 'reminders successfully added!' }, 201)
     } catch (error) {
-      console.log(error)
+      return c.json({ success: false, error: 'Failed to update reminders.json' }, 500)
     }
   }
 }
@@ -132,16 +143,31 @@ export class DeleteReminderRoute extends OpenAPIRoute {
   };
 
   async handle(c) {
-    const query = await c.req.query()
-
     try {
+      if (!checkAuth(c)) {
+        return c.json({ error: 'unauthorized' }, 401)
+      }
+
+      const query = await c.req.query()
+
       if (!query.id || query.id.trim() === '') {
         return c.json({ error: 'Missing or empty \'ID\' parameter' }, 400);
       }
 
-      console.log(query.id)
+      const res = await c.env.CDN.get('reminders.json')
+      let data = await res.json()
+
+      data = data.filter((item) => item.id !== query.id)
+
+      await c.env.CDN.put('reminders.json', JSON.stringify(data), {
+        httpMetadata: {
+          contentType: 'application/json'
+        }
+      })
+      
+      return c.json({ success: true, msg: `reminder '${query.id}' successfully deleted!` }, 200)
     } catch (error) {
-      console.log(error)
+      return c.json({ success: false, error: 'Failed to update reminders.json' }, 500)
     }
   }
 }

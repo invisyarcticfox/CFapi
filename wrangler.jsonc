@@ -14,7 +14,8 @@
 	"r2_buckets": [
 		{
 			"binding": "CDN",
-			"bucket_name": "cdn"
+			"bucket_name": "cdn",
+			"preview_bucket_name": "cdn"
 		}
 	],
 	"routes": [

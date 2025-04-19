@@ -1,5 +1,5 @@
 import { OpenAPIRoute, Arr } from 'chanfana';
-import { FortographySchema } from 'types';
+import { FortographySchema } from 'misc/types';
 import data from './json/fortography.json';
 
 
@@ -19,7 +19,5 @@ export class FortographyRoute extends OpenAPIRoute {
     },
   };
 
-  async handle(c) {
-    return data
-  }
+  async handle(c) { return data }
 }

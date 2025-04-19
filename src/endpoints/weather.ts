@@ -1,5 +1,5 @@
 import { OpenAPIRoute, Str, Num, Obj } from 'chanfana';
-import { WeatherSchema } from 'types';
+import { WeatherSchema } from 'misc/types';
 
 
 export class WeatherRoute extends OpenAPIRoute {
