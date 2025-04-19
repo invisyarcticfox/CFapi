@@ -1,22 +1,21 @@
-import { Str, Num } from "chanfana";
-import { z } from "zod";
+import { Str, Num, Arr, Obj } from "chanfana";
 
-export const SonaArtSchema = z.object({
-	artist: Str(),
-	artisturl: Str(),
-	platform: Str(),
-	file: Str(),
-	date: Str(),
-	dateUnix: Num(),
+export const SonaArtSchema = Obj({
+  artist: Str(),
+  artisturl: Str(),
+  platform: Str(),
+  file: Str(),
+  date: Str(),
+  dateUnix: Num(),
 })
 
-export const WeatherSchema = z.object({
-  coord: z.object({
+export const WeatherSchema = Obj({
+  coord: Obj({
     lon: Num(),
     lat: Num(),
   }),
-  weather: z.array(
-    z.object({
+  weather: Arr(
+    Obj({
       id: Num(),
       main: Str(),
       description: Str(),
@@ -24,7 +23,7 @@ export const WeatherSchema = z.object({
     }),
   ),
   base: Str(),
-  main: z.object({
+  main: Obj({
     temp: Num(),
     feels_like: Num(),
     temp_min: Num(),
@@ -35,20 +34,18 @@ export const WeatherSchema = z.object({
     grnd_level: Num(),
   }),
   visibility: Num(),
-  wind: z.object({
+  wind: Obj({
     speed: Num(),
     deg: Num(),
   }),
-  rain: z
-    .object({
-      '1h': Num(),
-    })
-    .optional(),
-  clouds: z.object({
+  rain: Obj({
+    '1h': Num(),
+  }).optional(),
+  clouds: Obj({
     all: Num(),
   }),
   dt: Num(),
-  sys: z.object({
+  sys: Obj({
     type: Num(),
     id: Num(),
     country: Str(),
@@ -60,3 +57,15 @@ export const WeatherSchema = z.object({
   name: Str(),
   cod: Num(),
 });
+
+export const FortographySchema = Obj({
+  char: Str(),
+  names: Arr(Str()),
+  stDlIn: Num().optional()
+})
+
+export const GetRemindersSchema = Obj({
+  txt: Str(),
+  details: Arr(Str()).optional(),
+  id: Str()
+})

@@ -1,12 +1,13 @@
-import { OpenAPIRoute, Str } from 'chanfana';
-import { z } from 'zod';
+import { OpenAPIRoute, Str, Num, Obj } from 'chanfana';
 import { WeatherSchema } from 'types';
+
 
 export class WeatherRoute extends OpenAPIRoute {
   schema = {
+    tags: ["Info"],
     summary: 'Get local weather information',
     request: {
-      query: z.object({
+      query: Obj({
         location: Str({ description: 'City Name', example: 'London,GB' }).optional()
       })
     },
@@ -18,7 +19,29 @@ export class WeatherRoute extends OpenAPIRoute {
             schema: WeatherSchema
           }
         }
-      }
+      },
+      '401': {
+        description: '',
+        content: {
+          'application/json': {
+            schema: Obj({
+              cod: Num({ example: 401 }),
+              message: Str({ example: 'invalid api key'})
+            })
+          }
+        }
+      },
+      '404': {
+        description: '',
+        content: {
+          'application/json': {
+            schema: Obj({
+              cod: Num({ example: 404 }),
+              message: Str({ example: 'city not found'})
+            })
+          }
+        }
+      },
     }
   }
 

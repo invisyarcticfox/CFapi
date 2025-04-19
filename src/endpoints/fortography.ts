@@ -1,18 +1,18 @@
 import { OpenAPIRoute, Arr } from 'chanfana';
-import { SonaArtSchema } from 'types';
-import data from './json/sonaart.json';
+import { FortographySchema } from 'types';
+import data from './json/fortography.json';
 
 
-export class SonaArtRoute extends OpenAPIRoute {
+export class FortographyRoute extends OpenAPIRoute {
   schema = {
     tags: ["Art"],
-    summary: 'Display information about my sona\'s art',
+    summary: 'Display a list of filenames for fortography',
     responses: {
       '200': {
         description: '',
         content: {
           'application/json': {
-            schema: Arr(SonaArtSchema),
+            schema: Arr(FortographySchema),
           },
         },
       },
