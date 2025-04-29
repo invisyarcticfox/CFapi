@@ -6,7 +6,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "newapi",
 	"main": "src/index.ts",
-	"compatibility_date": "2025-04-18",
+	"compatibility_date": "2025-04-16",
 	"compatibility_flags": [ "nodejs_compat" ],
 	"observability": {
 		"enabled": true
@@ -16,11 +16,16 @@
 			"binding": "CDN",
 			"bucket_name": "cdn",
 			"preview_bucket_name": "cdn"
+		},
+		{
+			"binding": "API",
+			"bucket_name": "api",
+			"preview_bucket_name": "api"
 		}
 	],
 	"routes": [
 		{
-			"pattern": "new-api.invisyarcticfox.uk",
+			"pattern": "api.invisyarcticfox.uk",
 			"custom_domain": true
 		}
 	]

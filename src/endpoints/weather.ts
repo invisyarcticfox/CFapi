@@ -47,10 +47,9 @@ export class WeatherRoute extends OpenAPIRoute {
 
   async handle(c) {
     try {
-      const data = await this.getValidatedData<typeof this.schema>();
-      const { location } = data.query;
+      const query = await c.req.query()
   
-      const usedCity = location || c.env.OWM_LOCATION;
+      const usedCity = query.location || c.env.OWM_LOCATION;
   
       const apiurl = `https://api.openweathermap.org/data/2.5/weather?q=${usedCity}&appid=${c.env.OWM_API_KEY}`;
       const res = await fetch(apiurl);
@@ -66,10 +65,10 @@ export class WeatherRoute extends OpenAPIRoute {
         );
       }
 
-      if (!location) {
+      if (!query.location) {
         delete wData.coord
-        delete wData.name
         delete wData.id
+        delete wData.name
       }
   
       return c.json(wData);

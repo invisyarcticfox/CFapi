@@ -1,6 +1,5 @@
 import { OpenAPIRoute, Arr } from 'chanfana';
 import { SonaArtSchema } from 'misc/types';
-import data from './json/sonaart.json';
 
 
 export class SonaArtRoute extends OpenAPIRoute {
@@ -19,5 +18,13 @@ export class SonaArtRoute extends OpenAPIRoute {
     },
   };
 
-  async handle(c) { return data }
+  async handle(c) {
+    try {
+      const res = await c.env.API.get('sonaart.json')
+      const d = await res.json()
+      return d
+    } catch (error) {
+      return error
+    }
+  }
 }
