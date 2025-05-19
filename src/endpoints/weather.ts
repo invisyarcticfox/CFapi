@@ -49,20 +49,15 @@ export class WeatherRoute extends OpenAPIRoute {
     try {
       const query = await c.req.query()
   
-      const usedCity = query.location || c.env.OWM_LOCATION;
+      const usedCity = query.location || c.env.OWM_LOCATION
   
-      const apiurl = `https://api.openweathermap.org/data/2.5/weather?q=${usedCity}&appid=${c.env.OWM_API_KEY}`;
-      const res = await fetch(apiurl);
-      const wData = await res.json();
+      const apiurl = `https://api.openweathermap.org/data/2.5/weather?q=${usedCity}&appid=${c.env.OWM_API_KEY}`
+      const res = await fetch(apiurl)
+      const wData = await res.json()
   
       if (!res.ok) {
-        console.error(
-          `OpenWeatherMap API error: ${res.status} ${res.statusText}`,
-        );
-        return c.json(
-          { success: false, error: 'Failed to fetch weather data' },
-          500,
-        );
+        console.error(`OpenWeatherMap API error: ${res.status} ${res.statusText}`)
+        return c.json({ success: false, error: 'Failed to fetch weather data' }, 500)
       }
 
       if (!query.location) {
@@ -71,13 +66,10 @@ export class WeatherRoute extends OpenAPIRoute {
         delete wData.name
       }
   
-      return c.json(wData);
+      return c.json(wData)
     } catch (error) {
-      console.error('Error fetching weather:', error);
-      return c.json(
-        { success: false, error: 'Internal server error' },
-        500,
-      );
+      console.error('Error fetching weather:', error)
+      return c.json({ success: false, error: 'Internal server error' }, 500 )
     }
   }  
 }

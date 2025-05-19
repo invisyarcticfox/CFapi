@@ -87,20 +87,29 @@ export class AddReminderRoute extends OpenAPIRoute {
         return c.json({ error: 'Expected an array in the request body' }, 400)
       }
   
-      const result = data.map(item => ({
+      const incomingCount = data.length
+
+      const existingData = await c.env.CDN.get('reminders.json')
+      const existingReminders = existingData ? JSON.parse(existingData) : []
+
+      const newData = data.map(item => ({
         ...item,
         id: generateId()
       }))
-      
-      await c.env.CDN.put('reminders.json', JSON.stringify(result), {
-        httpMetadata: {
-          contentType: 'application/json'
-        }
+
+      const mergedReminders = [...existingReminders, ...newData];
+
+      await c.env.CDN.put('reminders.json', JSON.stringify(mergedReminders), {
+        httpMetadata: { contentType: 'application/json' }
       })
       
-      return c.json({ success: true, msg: 'reminders successfully added!' }, 201)
+      const successMsg = incomingCount === 1
+        ? 'reminder successfully added!'
+        : 'reminders successfully added!'
+
+      return c.json({ success: true, msg: successMsg }, 201)
     } catch (error) {
-      return c.json({ success: false, error: 'Failed to update reminders.json' }, 500)
+      return c.json({ success: false, error: 'Failed to update reminders' }, 500)
     }
   }
 }
@@ -160,9 +169,7 @@ export class DeleteReminderRoute extends OpenAPIRoute {
       data = data.filter((item) => item.id !== query.id)
 
       await c.env.CDN.put('reminders.json', JSON.stringify(data), {
-        httpMetadata: {
-          contentType: 'application/json'
-        }
+        httpMetadata: { contentType: 'application/json' }
       })
       
       return c.json({ success: true, msg: `reminder '${query.id}' successfully deleted!` }, 200)
