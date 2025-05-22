@@ -20,7 +20,7 @@ export class GetRemindersRoute extends OpenAPIRoute {
   };
 
   async handle(c) {
-    const res = await c.env.CDN.get('reminders.json')
+    const res = await c.env.API.get('reminders.json')
     const data = await res.json()
     return c.json(data)
   }
@@ -89,7 +89,7 @@ export class AddReminderRoute extends OpenAPIRoute {
   
       const incomingCount = data.length
 
-      const existingData = await c.env.CDN.get('reminders.json')
+      const existingData = await c.env.API.get('reminders.json')
       const existingReminders = existingData ? JSON.parse(existingData) : []
 
       const newData = data.map(item => ({
@@ -99,7 +99,7 @@ export class AddReminderRoute extends OpenAPIRoute {
 
       const mergedReminders = [...existingReminders, ...newData];
 
-      await c.env.CDN.put('reminders.json', JSON.stringify(mergedReminders), {
+      await c.env.API.put('reminders.json', JSON.stringify(mergedReminders), {
         httpMetadata: { contentType: 'application/json' }
       })
       
@@ -163,12 +163,12 @@ export class DeleteReminderRoute extends OpenAPIRoute {
         return c.json({ error: 'Missing or empty \'ID\' parameter' }, 400);
       }
 
-      const res = await c.env.CDN.get('reminders.json')
+      const res = await c.env.API.get('reminders.json')
       let data = await res.json()
 
       data = data.filter((item) => item.id !== query.id)
 
-      await c.env.CDN.put('reminders.json', JSON.stringify(data), {
+      await c.env.API.put('reminders.json', JSON.stringify(data), {
         httpMetadata: { contentType: 'application/json' }
       })
       
