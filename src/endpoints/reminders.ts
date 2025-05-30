@@ -90,7 +90,7 @@ export class AddReminder extends OpenAPIRoute {
   
       const result = data.map(item => ({
         ...item,
-        id: generateId
+        id: generateId()
       }))
       
       await c.env.API.put('reminders.json', JSON.stringify(result), {
