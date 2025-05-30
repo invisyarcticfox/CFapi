@@ -13,11 +13,6 @@
 	},
 	"r2_buckets": [
 		{
-			"binding": "CDN",
-			"bucket_name": "cdn",
-			"preview_bucket_name": "cdn"
-		},
-		{
 			"binding": "API",
 			"bucket_name": "api",
 			"preview_bucket_name": "api"

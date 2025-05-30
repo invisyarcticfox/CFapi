@@ -1,10 +1,10 @@
-import { OpenAPIRoute, Str, Num, Obj } from 'chanfana';
-import { WeatherSchema } from 'misc/types';
+import { OpenAPIRoute, Str, Num, Obj } from 'chanfana'
+import { WeatherSchema } from 'misc/types'
 
 
-export class WeatherRoute extends OpenAPIRoute {
+export class Weather extends OpenAPIRoute {
   schema = {
-    tags: ["Info"],
+    tags: ['Info'],
     summary: 'Get local weather information',
     request: {
       query: Obj({
@@ -46,38 +46,35 @@ export class WeatherRoute extends OpenAPIRoute {
   }
 
   async handle(c) {
+    type weatherData = {
+      coord: {}
+      id: number;
+      name: string;
+    }
+
     try {
       const query = await c.req.query()
   
-      const usedCity = query.location || c.env.OWM_LOCATION;
-  
-      const apiurl = `https://api.openweathermap.org/data/2.5/weather?q=${usedCity}&appid=${c.env.OWM_API_KEY}`;
-      const res = await fetch(apiurl);
-      const wData = await res.json();
+      const usedCity = query.location || c.env.OWM_LOCATION
+
+      const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${usedCity}&appid=${c.env.OWM_API_KEY}`)
+      const d:weatherData = await res.json()
   
       if (!res.ok) {
-        console.error(
-          `OpenWeatherMap API error: ${res.status} ${res.statusText}`,
-        );
-        return c.json(
-          { success: false, error: 'Failed to fetch weather data' },
-          500,
-        );
+        console.error(`OpenWeatherMap API error: ${res.status} ${res.statusText}`)
+        return c.json({ success: false, error: 'Failed to fetch weather data' }, 500 )
       }
 
       if (!query.location) {
-        delete wData.coord
-        delete wData.id
-        delete wData.name
+        delete d.coord
+        delete d.id
+        delete d.name
       }
   
-      return c.json(wData);
+      return c.json(d)
     } catch (error) {
-      console.error('Error fetching weather:', error);
-      return c.json(
-        { success: false, error: 'Internal server error' },
-        500,
-      );
+      console.error(error)
+      return c.json({ success: false, error: 'Internal server error' }, 500 )
     }
   }  
 }

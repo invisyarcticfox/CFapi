@@ -1,30 +1,31 @@
-import { OpenAPIRoute, Arr } from 'chanfana';
-import { FortographySchema } from 'misc/types';
+import { OpenAPIRoute } from 'chanfana'
+import { FortographySchema } from 'misc/types'
 
 
-export class FortographyRoute extends OpenAPIRoute {
+export class Fortography extends OpenAPIRoute {
   schema = {
-    tags: ["Art"],
+    tags: ['Art'],
     summary: 'Display a list of filenames for fortography',
     responses: {
       '200': {
         description: '',
         content: {
           'application/json': {
-            schema: Arr(FortographySchema),
+            schema: FortographySchema,
           },
         },
       },
     },
-  };
+  }
 
   async handle(c) {
     try {
       const res = await c.env.API.get('fortography.json')
       const d = await res.json()
-      return d
+      return c.json(d)
     } catch (error) {
-      return error
+      console.error(error)
+      return c.json({ success: false, error: 'Failed to get fortography' }, 500)
     }
   }
 }
