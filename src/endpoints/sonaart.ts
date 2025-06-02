@@ -11,11 +11,11 @@ export class SonaArt extends OpenAPIRoute {
         description: '',
         content: {
           'application/json': {
-            schema: SonaArtSchema,
-          },
-        },
-      },
-    },
+            schema: SonaArtSchema
+          }
+        }
+      }
+    }
   }
 
   async handle(c) {

@@ -11,11 +11,11 @@ export class Fortography extends OpenAPIRoute {
         description: '',
         content: {
           'application/json': {
-            schema: FortographySchema,
-          },
-        },
-      },
-    },
+            schema: FortographySchema
+          }
+        }
+      }
+    }
   }
 
   async handle(c) {

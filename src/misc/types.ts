@@ -67,3 +67,5 @@ export const GetRemindersSchema = Arr({
   details: Arr(Str).optional,
   id: Str
 })
+
+export const RandomLyricSchema = Arr(Str)

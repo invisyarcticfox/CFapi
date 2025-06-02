@@ -12,11 +12,11 @@ export class GetReminders extends OpenAPIRoute {
         description: '',
         content: {
           'application/json': {
-            schema: GetRemindersSchema,
-          },
-        },
-      },
-    },
+            schema: GetRemindersSchema
+          }
+        }
+      }
+    }
   }
 
   async handle(c) {
@@ -36,7 +36,6 @@ export class AddReminder extends OpenAPIRoute {
     tags: ['Reminders'],
     summary: 'Add a reminder',
     requestBody: {
-      description: '',
       content: {
         'application/json': {
           schema: {
@@ -53,7 +52,7 @@ export class AddReminder extends OpenAPIRoute {
               title: 'do this thing',
               details: [
                 'some info',
-                'some more info',
+                'some more info'
               ]
             }
           }
@@ -62,27 +61,31 @@ export class AddReminder extends OpenAPIRoute {
     },
     responses: {
       '201': {
-        description: '',
         content: {
-          'text/plain': {
-            schema: Str({ example: 'reminder saved successfully with id: \'ID\'' }),
-          },
-        },
+          'application/json': {
+            schema: Obj({
+              success: true,
+              msg: 'reminder saved successfully with id: \'ID\''
+            }),
+          }
+        }
       },
       '401': {
-        description: '',
         content: {
-          'text/plain': {
-            schema: Str({ example: 'unauthorized' }),
-          },
-        },
-      },
-    },
+          'application/json': {
+            schema: Obj({
+              success: false,
+              error: 'unautorised'
+            }),
+          }
+        }
+      }
+    }
   }
 
   async handle(c) {
     try {
-      if (!checkAuth(c)) return c.json({ error: 'unauthorized' }, 401 )
+      if (!checkAuth(c)) return c.json({ error: 'unautorised' }, 401 )
 
       const data = await c.req.json()
   
@@ -96,8 +99,13 @@ export class AddReminder extends OpenAPIRoute {
       await c.env.API.put('reminders.json', JSON.stringify(result), {
         httpMetadata: { contentType: 'application/json' }
       })
+
+      if (data.length === 1 ) {
+        return c.json({ success: true, msg: 'reminder successfully added' }, 201)
+      } else {
+        return c.json({ success: true, msg: 'reminders successfully added' }, 201)
+      }
       
-      return c.json({ success: true, msg: 'reminders successfully added!' }, 201)
     } catch (error) {
       console.error(error)
       return c.json({ success: false, error: 'Failed to update reminders' }, 500)
@@ -112,57 +120,75 @@ export class DeleteReminder extends OpenAPIRoute {
     request: {
       query: Obj({
         id: Str({ description: 'reminder id', example: 'a6HL27' })
-      }),
+      })
     },
     responses: {
       '200': {
-        description: '',
         content: {
-          'text/plain': {
-            schema: Str({ example: 'reminder \'ID\' successfully deleted'}),
-          },
-        },
+          'application/json': {
+            schema: Obj({
+              success: true,
+              msg: 'reminder \'ID\' successfully deleted'
+            }),
+          }
+        }
       },
       '400': {
-        description: '',
         content: {
-          'text/plain': {
-            schema: Str({ example: 'missing id parameter'}),
-          },
-        },
+          'application/json': {
+            schema: Obj({
+              success: false,
+              error: 'missing id parameter'
+            })
+          }
+        }
       },
       '401': {
-        description: '',
         content: {
-          'text/plain': {
-            schema: Str({ example: 'unauthorized' }),
-          },
-        },
-      },
-    },
+          'application/json': {
+            schema: Obj({
+              success: false,
+              error: 'unautorised'
+            }),
+          }
+        }
+      }
+    }
   }
 
   async handle(c) {
     try {
-      if (!checkAuth(c))  return c.json({ error: 'unauthorized' }, 401 )
+      if (!checkAuth(c)) return c.json({ error: 'unautorised' }, 401 )
 
       const query = await c.req.query()
-
-      if (!query.id || query.id.trim() === '')  return c.json({ error: 'Missing or empty \'ID\' parameter' }, 400 )
+      if (!query.id || query.id.trim() === '') return c.json({ error: 'Missing or empty \'ID\' parameter' }, 400 )
+      
+      const idsToDelete = query.id.split(',').map(id => id.trim())
 
       const res = await c.env.API.get('reminders.json')
       let data = await res.json()
+      
+      if (!Array.isArray(data)) data = []
+      
+      const initialLength = data.length
+      data = data.filter(item => !idsToDelete.includes(item.id))
+      const deletedCount = initialLength - data.length
 
-      data = data.filter((item: { id: string }) => item.id !== query.id)
+      if (deletedCount === 0) return c.json({ success: false, msg: 'No matching reminders found for deletion' }, 404 )
 
       await c.env.API.put('reminders.json', JSON.stringify(data), {
         httpMetadata: { contentType: 'application/json' }
       })
-      
-      return c.json({ success: true, msg: `reminder '${query.id}' successfully deleted!` }, 200)
+
+      const msg =
+        deletedCount === 1
+          ? `reminder '${query.id}' successfully deleted`
+          : `reminders '${query.id}' successfully deleted`
+
+      return c.json({ success: true, msg: msg }, 200)
     } catch (error) {
       console.error(error)
-      return c.json({ success: false, error: 'Failed to update reminders' }, 500)
+      return c.json({ success: false, error: 'Failed to delete reminders' }, 500)
     }
   }
 }

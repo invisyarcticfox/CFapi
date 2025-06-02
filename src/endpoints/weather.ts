@@ -41,7 +41,7 @@ export class Weather extends OpenAPIRoute {
             })
           }
         }
-      },
+      }
     }
   }
 
