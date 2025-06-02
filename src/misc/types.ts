@@ -1,5 +1,6 @@
 import { Str, Num, Arr, Obj } from 'chanfana'
 
+
 export const SonaArtSchema = Arr({
   artist: Str,
   artisturl: Str,
@@ -9,20 +10,15 @@ export const SonaArtSchema = Arr({
 })
 
 export const WeatherSchema = Obj({
-  coord: Obj({
-    lon: Num,
-    lat: Num,
+  coord: { lon: Num, lat: Num },
+  weather: Arr({
+    id: Num,
+    main: Str,
+    description: Str,
+    icon: Str
   }),
-  weather: Arr(
-    Obj({
-      id: Num,
-      main: Str,
-      description: Str,
-      icon: Str,
-    }),
-  ),
   base: Str,
-  main: Obj({
+  main: {
     temp: Num,
     feels_like: Num,
     temp_min: Num,
@@ -30,42 +26,44 @@ export const WeatherSchema = Obj({
     pressure: Num,
     humidity: Num,
     sea_level: Num,
-    grnd_level: Num,
-  }),
+    grnd_level: Num
+  },
   visibility: Num,
-  wind: Obj({
+  wind: {
     speed: Num,
     deg: Num,
-  }),
-  rain: Obj({
-    '1h': Num,
-  }).optional(),
-  clouds: Obj({
-    all: Num,
-  }),
+    gust: Num
+  },
+  rain: { "1h": Num },
+  clouds: { all: Num },
   dt: Num,
-  sys: Obj({
+  sys: {
     type: Num,
     id: Num,
     country: Str,
     sunrise: Num,
-    sunset: Num,
-  }),
+    sunset: Num
+  },
   timezone: Num,
   id: Num,
   name: Str,
-  cod: Num,
+  cod: Num
 })
+export type weatherData = {
+  coord: { lat: number, lon: number }
+  id: number
+  name: string
+}
 
 export const FortographySchema = Arr({
   char: Str,
   names: Arr(Str)
 })
 
-export const GetRemindersSchema = Arr({
+export const RemindersSchema = Arr({
   txt: Str,
   details: Arr(Str).optional,
   id: Str
 })
 
-export const RandomLyricSchema = Arr(Str)
+export const LyricSchema = Arr(Str)

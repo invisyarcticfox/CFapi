@@ -1,17 +1,18 @@
-import { OpenAPIRoute, Obj } from 'chanfana'
-import { RandomLyricSchema } from 'misc/types'
+import { OpenAPIRoute } from 'chanfana'
+import { LyricSchema } from 'misc/types'
 import { checkAuth } from 'misc/utils'
 
 
 export class GetRandomLyric extends OpenAPIRoute {
   schema = {
     tags: ['Songs'],
-    summary: '',
+    summary: 'Get a random lyric from a database',
     responses: {
       '200': {
+        description: 'A random lyric',
         content: {
           'application/json': {
-            schema: RandomLyricSchema
+            schema: LyricSchema
           },
         },
       },
@@ -29,7 +30,7 @@ export class GetRandomLyric extends OpenAPIRoute {
       return c.json({ lyric: randomLyric }, 200)
     } catch (error) {
       console.error(error);
-      return c.json({ success: false, error: 'Failed to get lyrics' }, 500)
+      return c.json({ success: false, msg: 'Failed to get lyrics' }, 500)
     }
   }
 }
@@ -37,48 +38,122 @@ export class GetRandomLyric extends OpenAPIRoute {
 export class AddLyric extends OpenAPIRoute {
   schema = {
     tags: ['Songs'],
-    summary: '',
+    summary: 'Add a lyric from a database',
     requestBody: {
+      required: true,
       content: {
         'text/plain': {
           schema: {
             type: 'string',
-            example: 'this is a new lyric'
+            example: '\'this is a new lyric\''
           }
         }
       },
     },
     responses: {
       '201': {
+        description: 'successfully added a lyric',
         content: {
           'application/json': {
-            schema: Obj({
-              success: true,
-              msg: 'reminders successfully added'
-            }),
+            schema: {
+              properties: {
+                success: {
+                  type: 'boolean',
+                  example: true
+                },
+                msg: {
+                  type: 'string',
+                  example: 'lyric added successfully'
+                }
+              }
+            }
+          }
+        },
+      },
+      '415': {
+        description: 'invalid Content-Type',
+        content: {
+          'application/json': {
+            schema: {
+              properties: {
+                success: {
+                  type: 'boolean',
+                  example: false
+                },
+                msg: {
+                  type: 'string',
+                  example: 'invalid Content-Type'
+                }
+              }
+            }
           }
         }
       },
       '401': {
+        description: 'unauthorised',
         content: {
           'application/json': {
-            schema: Obj({
-              success: false,
-              error: 'unautorised'
-            }),
+            schema: {
+              properties: {
+                success: {
+                  type: 'boolean',
+                  example: false
+                },
+                msg: {
+                  type: 'string',
+                  example: 'unauthorised'
+                }
+              }
+            }
           }
         }
-      }
-    }
+      },
+      '400': {
+        description: 'bad request',
+        content: {
+          'application/json': {
+            schema: {
+              properties: {
+                success: {
+                  type: 'boolean',
+                  example: false
+                },
+                msg: {
+                  type: 'string',
+                  example: 'lyric cannot be empty'
+                }
+              }
+            }
+          }
+        }
+      },
+    },
   }
 
   async handle(c) {
     try {
-      if (!checkAuth(c)) return c.json({ error: 'unautorised' }, 401 )
+      if (!checkAuth(c)) {
+        return c.json({
+          success: false,
+          msg: 'unauthorised'
+        }, 401 )
+      }
+      
+      if (!c.req.header('Content-Type').startsWith('text/plain')) {
+        return c.json({
+          success: false,
+          msg: 'invalid Content-Type'
+        }, 415)
+      }
 
-      const newLyric = c.req.text()
+      const newLyric = await c.req.text()
 
-      if (!newLyric || newLyric.trim() === '') return c.json({ error: 'lyric cannot be empty' }, 400)
+      if (!newLyric || newLyric.trim() === '') {
+        return c.json({
+          success: false,
+          msg: 'lyric cannot be empty'
+        }, 400)
+      }
 
       const res = await c.env.API.get('lyrics.json')
       const d = await res.json()
@@ -92,7 +167,7 @@ export class AddLyric extends OpenAPIRoute {
       return c.json({ success: true, msg: 'lyric successfully added' }, 201)
     } catch (error) {
       console.error(error)
-      return c.json({ success: false, error: 'Failed to update lyrics' }, 500)
+      return c.json({ success: false, msg: 'Failed to update lyrics' }, 500)
     }
   }
 }

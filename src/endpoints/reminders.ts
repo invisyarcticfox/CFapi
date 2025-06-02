@@ -1,22 +1,22 @@
-import { OpenAPIRoute, Str, Obj } from 'chanfana'
-import { GetRemindersSchema } from 'misc/types'
+import { OpenAPIRoute, Obj, Str } from 'chanfana'
+import { RemindersSchema } from 'misc/types'
 import { checkAuth, generateId } from 'misc/utils'
 
 
 export class GetReminders extends OpenAPIRoute {
   schema = {
     tags: ['Reminders'],
-    summary: 'Display a list of reminders',
+    summary: 'Get reminders',
     responses: {
       '200': {
-        description: '',
+        description: 'Either a list of reminders or just an empty array',
         content: {
           'application/json': {
-            schema: GetRemindersSchema
-          }
-        }
-      }
-    }
+            schema: RemindersSchema
+          },
+        },
+      },
+    },
   }
 
   async handle(c) {
@@ -26,12 +26,12 @@ export class GetReminders extends OpenAPIRoute {
       return c.json(d)
     } catch (error) {
       console.error(error)
-      return c.json({ success: false, error: 'Failed to get reminders' }, 500)
+      return c.json({ success: false, msg: 'Failed to get reminders' }, 500)
     }
   }
 }
 
-export class AddReminder extends OpenAPIRoute {
+export class AddReminders extends OpenAPIRoute {
   schema = {
     tags: ['Reminders'],
     summary: 'Add a reminder',
@@ -61,35 +61,82 @@ export class AddReminder extends OpenAPIRoute {
     },
     responses: {
       '201': {
+        description: 'successfully added a reminder',
         content: {
           'application/json': {
-            schema: Obj({
-              success: true,
-              msg: 'reminder saved successfully with id: \'ID\''
-            }),
+            schema: {
+              properties: {
+                success: {
+                  type: 'boolean',
+                  example: true
+                },
+                msg: {
+                  type: 'string',
+                  example: 'reminder added successfully'
+                }
+              }
+            }
+          }
+        },
+      },
+      '401': {
+        description: 'unauthorised',
+        content: {
+          'application/json': {
+            schema: {
+              properties: {
+                success: {
+                  type: 'boolean',
+                  example: false
+                },
+                msg: {
+                  type: 'string',
+                  example: 'unauthorised'
+                }
+              }
+            }
           }
         }
       },
-      '401': {
+      '400': {
+        description: 'bad request',
         content: {
           'application/json': {
-            schema: Obj({
-              success: false,
-              error: 'unautorised'
-            }),
+            schema: {
+              properties: {
+                success: {
+                  type: 'boolean',
+                  example: false
+                },
+                msg: {
+                  type: 'string',
+                  example: 'expected an array'
+                }
+              }
+            }
           }
         }
-      }
+      },
     }
   }
 
   async handle(c) {
     try {
-      if (!checkAuth(c)) return c.json({ error: 'unautorised' }, 401 )
+      if (!checkAuth(c)) {
+        return c.json({
+          success: false,
+          msg: 'unauthorised'
+        }, 401 )
+      }
 
       const data = await c.req.json()
   
-      if (!Array.isArray(data)) return c.json({ error: 'Expected an array in the request body' }, 400 )
+      if (!Array.isArray(data)) {
+        return c.json({
+          success: false,
+          msg: 'Expected an array in the request body'
+        }, 400 )
+      }
   
       const result = data.map(item => ({
         ...item,
@@ -108,15 +155,15 @@ export class AddReminder extends OpenAPIRoute {
       
     } catch (error) {
       console.error(error)
-      return c.json({ success: false, error: 'Failed to update reminders' }, 500)
+      return c.json({ success: false, msg: 'Failed to update reminders' }, 500)
     }
   }
 }
 
-export class DeleteReminder extends OpenAPIRoute {
+export class DeleteReminders extends OpenAPIRoute {
   schema = {
     tags: ['Reminders'],
-    summary: 'Delete a reminder by id',
+    summary: 'Delete a reminder',
     request: {
       query: Obj({
         id: Str({ description: 'reminder id', example: 'a6HL27' })
@@ -124,44 +171,101 @@ export class DeleteReminder extends OpenAPIRoute {
     },
     responses: {
       '200': {
+        description: 'successfully deleted a reminder',
         content: {
           'application/json': {
-            schema: Obj({
-              success: true,
-              msg: 'reminder \'ID\' successfully deleted'
-            }),
+            schema: {
+              properties: {
+                success: {
+                  type: 'boolean',
+                  example: true
+                },
+                msg: {
+                  type: 'string',
+                  example: 'reminder deleted successfully'
+                }
+              }
+            }
+          }
+        },
+      },
+      '401': {
+        description: 'unauthorised',
+        content: {
+          'application/json': {
+            schema: {
+              properties: {
+                success: {
+                  type: 'boolean',
+                  example: false
+                },
+                msg: {
+                  type: 'string',
+                  example: 'unauthorised'
+                }
+              }
+            }
           }
         }
       },
       '400': {
+        description: 'bad request',
         content: {
           'application/json': {
-            schema: Obj({
-              success: false,
-              error: 'missing id parameter'
-            })
+            schema: {
+              properties: {
+                success: {
+                  type: 'boolean',
+                  example: false
+                },
+                msg: {
+                  type: 'string',
+                  example: 'missing or empty \'id\' parameter'
+                }
+              }
+            }
           }
         }
       },
-      '401': {
+      '404': {
+        description: 'not found',
         content: {
           'application/json': {
-            schema: Obj({
-              success: false,
-              error: 'unautorised'
-            }),
+            schema: {
+              properties: {
+                success: {
+                  type: 'boolean',
+                  example: false
+                },
+                msg: {
+                  type: 'string',
+                  example: 'no matching reminders found for deletion'
+                }
+              }
+            }
           }
         }
-      }
+      },
     }
   }
 
   async handle(c) {
     try {
-      if (!checkAuth(c)) return c.json({ error: 'unautorised' }, 401 )
+      if (!checkAuth(c)) {
+        return c.json({
+          success: false,
+          msg: 'unautorised'
+        }, 401 )
+      }
 
       const query = await c.req.query()
-      if (!query.id || query.id.trim() === '') return c.json({ error: 'Missing or empty \'ID\' parameter' }, 400 )
+
+      if (!query.id || query.id.trim() === '') {
+        return c.json({
+          success: false,
+          msg: 'Missing or empty \'ID\' parameter'
+        }, 400 )
+      }
       
       const idsToDelete = query.id.split(',').map(id => id.trim())
 
@@ -174,21 +278,25 @@ export class DeleteReminder extends OpenAPIRoute {
       data = data.filter(item => !idsToDelete.includes(item.id))
       const deletedCount = initialLength - data.length
 
-      if (deletedCount === 0) return c.json({ success: false, msg: 'No matching reminders found for deletion' }, 404 )
+      if (deletedCount === 0) {
+        return c.json({
+          success: false,
+          msg: 'No matching reminders found for deletion'
+        }, 404 )
+      }
 
       await c.env.API.put('reminders.json', JSON.stringify(data), {
         httpMetadata: { contentType: 'application/json' }
       })
 
-      const msg =
-        deletedCount === 1
-          ? `reminder '${query.id}' successfully deleted`
-          : `reminders '${query.id}' successfully deleted`
-
-      return c.json({ success: true, msg: msg }, 200)
+      if (deletedCount === 1 ) {
+        return c.json({ success: true, msg: `reminder '${query.id}' successfully deleted` }, 200)
+      } else {
+        return c.json({ success: true, msg: `reminders '${query.id}' successfully deleted` }, 200)
+      }
     } catch (error) {
       console.error(error)
-      return c.json({ success: false, error: 'Failed to delete reminders' }, 500)
+      return c.json({ success: false, msg: 'Failed to delete reminders' }, 500)
     }
   }
 }

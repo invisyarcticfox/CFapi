@@ -2,20 +2,20 @@ import { OpenAPIRoute } from 'chanfana'
 import { FortographySchema } from 'misc/types'
 
 
-export class Fortography extends OpenAPIRoute {
+export class GetFortography extends OpenAPIRoute {
   schema = {
     tags: ['Art'],
-    summary: 'Display a list of filenames for fortography',
+    summary: 'Get fortography screenshots',
     responses: {
       '200': {
-        description: '',
+        description: 'A list of file names for fortography screenshots',
         content: {
           'application/json': {
             schema: FortographySchema
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   }
 
   async handle(c) {
@@ -25,7 +25,7 @@ export class Fortography extends OpenAPIRoute {
       return c.json(d)
     } catch (error) {
       console.error(error)
-      return c.json({ success: false, error: 'Failed to get fortography' }, 500)
+      return c.json({ success: false, msg: 'Failed to get fortography' }, 500)
     }
   }
 }

@@ -2,20 +2,20 @@ import { OpenAPIRoute } from 'chanfana'
 import { SonaArtSchema } from 'misc/types'
 
 
-export class SonaArt extends OpenAPIRoute {
+export class GetSonaArt extends OpenAPIRoute {
   schema = {
     tags: ['Art'],
-    summary: 'Display information about my sona\'s art',
+    summary: 'Get sona art information',
     responses: {
       '200': {
-        description: '',
+        description: 'A list of all my sona\'s art, along with artist information and dates',
         content: {
           'application/json': {
             schema: SonaArtSchema
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   }
 
   async handle(c) {
@@ -25,7 +25,7 @@ export class SonaArt extends OpenAPIRoute {
       return c.json(d)
     } catch (error) {
       console.error(error)
-      return c.json({ success: false, error: 'Internal server error' }, 500 )
+      return c.json({ success: false, msg: 'Internal server error' }, 500 )
     }
   }
 }
