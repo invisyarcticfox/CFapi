@@ -9,13 +9,10 @@ export class GetSonaArt extends OpenAPIRoute {
     responses: {
       '200': {
         description: 'A list of all my sona\'s art, along with artist information and dates',
-        content: {
-          'application/json': {
-            schema: SonaArtSchema
-          },
-        },
-      },
-    },
+        content: { 'application/json': { schema: SonaArtSchema }
+        }
+      }
+    }
   }
 
   async handle(c) {

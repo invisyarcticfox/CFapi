@@ -1,37 +1,28 @@
 import { OpenAPIRoute, Str, Obj } from 'chanfana'
-import { WeatherSchema, type weatherData } from 'misc/types'
+import { WeatherSchema } from 'misc/types'
 
+type weatherData = {
+  coord: { lat: number, lon: number }
+  id: number
+  name: string
+}
 
 export class GetWeather extends OpenAPIRoute {
   schema = {
     tags: ['Info'],
     summary: 'Get local weather information',
-    request: {
-      query: Obj({
-        location: Str({ description: 'City Name', example: 'London,GB' }).optional()
-      })
-    },
+    request: { query: Obj({ location: Str({ description: 'City Name', example: 'London,GB' }).optional() }) },
     responses: {
       '200': {
         description: 'successful weather request',
-        content: {
-          'application/json': {
-            schema: WeatherSchema
-          },
-        },
+        content: { 'application/json': { schema: WeatherSchema } }
       },
       '404': {
         description: 'invalid weather request',
-        content: {
-          'application/json': {
-            schema: Obj({
-              cod: 404,
-              message: 'city not found'
-            })
-          }
+        content: { 'application/json': { schema: Obj({ cod: 404, message: 'city not found' }) }
         }
       }
-    },
+    }
   }
 
   async handle(c) {

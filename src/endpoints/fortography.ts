@@ -9,13 +9,9 @@ export class GetFortography extends OpenAPIRoute {
     responses: {
       '200': {
         description: 'A list of file names for fortography screenshots',
-        content: {
-          'application/json': {
-            schema: FortographySchema
-          },
-        },
-      },
-    },
+        content: { 'application/json': { schema: FortographySchema } }
+      }
+    }
   }
 
   async handle(c) {

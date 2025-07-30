@@ -9,14 +9,15 @@
 		"cf-typegen": "wrangler types"
 	},
 	"dependencies": {
-		"chanfana": "^2.8.0",
-		"hono": "^4.7.10",
-		"zod": "^3.25.28"
+		"@atproto/api": "^0.15.26",
+		"chanfana": "^2.8.1",
+		"hono": "^4.8.5",
+		"zod": "^4.0.5"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20250525.0",
-		"@types/node": "22.15.21",
+		"@cloudflare/workers-types": "^4.20250715.0",
+		"@types/node": "24.0.14",
 		"@types/service-worker-mock": "^2.0.4",
-		"wrangler": "^4.16.1"
+		"wrangler": "^4.25.0"
 	}
 }

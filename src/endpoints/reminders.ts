@@ -10,13 +10,9 @@ export class GetReminders extends OpenAPIRoute {
     responses: {
       '200': {
         description: 'Either a list of reminders or just an empty array',
-        content: {
-          'application/json': {
-            schema: RemindersSchema
-          },
-        },
-      },
-    },
+        content: { 'application/json': { schema: RemindersSchema } }
+      }
+    }
   }
 
   async handle(c) {
@@ -42,18 +38,12 @@ export class AddReminders extends OpenAPIRoute {
             type: 'object',
             properties: {
               title: { type: 'string' },
-              details: {
-                type: 'array',
-                items: { type: 'string' }
-              }
+              details: { type: 'array', items: { type: 'string' } }
             },
             required: ['title'],
             example: {
               title: 'do this thing',
-              details: [
-                'some info',
-                'some more info'
-              ]
+              details: [ 'some info', 'some more info' ]
             }
           }
         }
@@ -66,14 +56,8 @@ export class AddReminders extends OpenAPIRoute {
           'application/json': {
             schema: {
               properties: {
-                success: {
-                  type: 'boolean',
-                  example: true
-                },
-                msg: {
-                  type: 'string',
-                  example: 'reminder added successfully'
-                }
+                success: { type: 'boolean', example: true },
+                msg: { type: 'string', example: 'reminder added successfully' }
               }
             }
           }
@@ -85,14 +69,8 @@ export class AddReminders extends OpenAPIRoute {
           'application/json': {
             schema: {
               properties: {
-                success: {
-                  type: 'boolean',
-                  example: false
-                },
-                msg: {
-                  type: 'string',
-                  example: 'unauthorised'
-                }
+                success: { type: 'boolean', example: false },
+                msg: { type: 'string', example: 'unauthorised' }
               }
             }
           }
@@ -104,14 +82,8 @@ export class AddReminders extends OpenAPIRoute {
           'application/json': {
             schema: {
               properties: {
-                success: {
-                  type: 'boolean',
-                  example: false
-                },
-                msg: {
-                  type: 'string',
-                  example: 'expected an array'
-                }
+                success: { type: 'boolean', example: false },
+                msg: { type: 'string', example: 'expected an array' }
               }
             }
           }
@@ -122,21 +94,11 @@ export class AddReminders extends OpenAPIRoute {
 
   async handle(c) {
     try {
-      if (!checkAuth(c)) {
-        return c.json({
-          success: false,
-          msg: 'unauthorised'
-        }, 401 )
-      }
+      if (!checkAuth(c)) { return c.json({ success: false, msg: 'unauthorised' }, 401) }
 
       const data = await c.req.json()
   
-      if (!Array.isArray(data)) {
-        return c.json({
-          success: false,
-          msg: 'Expected an array in the request body'
-        }, 400 )
-      }
+      if (!Array.isArray(data)) { return c.json({ success: false, msg: 'Expected an array in the request body' }, 400) }
   
       const result = data.map(item => ({
         ...item,
@@ -176,14 +138,8 @@ export class DeleteReminders extends OpenAPIRoute {
           'application/json': {
             schema: {
               properties: {
-                success: {
-                  type: 'boolean',
-                  example: true
-                },
-                msg: {
-                  type: 'string',
-                  example: 'reminder deleted successfully'
-                }
+                success: { type: 'boolean', example: true },
+                msg: { type: 'string', example: 'reminder deleted successfully' }
               }
             }
           }
@@ -195,14 +151,8 @@ export class DeleteReminders extends OpenAPIRoute {
           'application/json': {
             schema: {
               properties: {
-                success: {
-                  type: 'boolean',
-                  example: false
-                },
-                msg: {
-                  type: 'string',
-                  example: 'unauthorised'
-                }
+                success: { type: 'boolean', example: false },
+                msg: { type: 'string', example: 'unauthorised' }
               }
             }
           }
@@ -214,14 +164,8 @@ export class DeleteReminders extends OpenAPIRoute {
           'application/json': {
             schema: {
               properties: {
-                success: {
-                  type: 'boolean',
-                  example: false
-                },
-                msg: {
-                  type: 'string',
-                  example: 'missing or empty \'id\' parameter'
-                }
+                success: { type: 'boolean', example: false },
+                msg: { type: 'string', example: 'missing or empty \'id\' parameter' }
               }
             }
           }
@@ -233,14 +177,8 @@ export class DeleteReminders extends OpenAPIRoute {
           'application/json': {
             schema: {
               properties: {
-                success: {
-                  type: 'boolean',
-                  example: false
-                },
-                msg: {
-                  type: 'string',
-                  example: 'no matching reminders found for deletion'
-                }
+                success: { type: 'boolean', example: false },
+                msg: { type: 'string', example: 'no matching reminders found for deletion' }
               }
             }
           }
@@ -251,21 +189,11 @@ export class DeleteReminders extends OpenAPIRoute {
 
   async handle(c) {
     try {
-      if (!checkAuth(c)) {
-        return c.json({
-          success: false,
-          msg: 'unautorised'
-        }, 401 )
-      }
+      if (!checkAuth(c)) { return c.json({ success: false, msg: 'unautorised' }, 401) }
 
       const query = await c.req.query()
 
-      if (!query.id || query.id.trim() === '') {
-        return c.json({
-          success: false,
-          msg: 'Missing or empty \'ID\' parameter'
-        }, 400 )
-      }
+      if (!query.id || query.id.trim() === '') { return c.json({ success: false, msg: 'Missing or empty \'ID\' parameter' }, 400) }
       
       const idsToDelete = query.id.split(',').map(id => id.trim())
 
@@ -275,19 +203,12 @@ export class DeleteReminders extends OpenAPIRoute {
       if (!Array.isArray(data)) data = []
       
       const initialLength = data.length
-      data = data.filter(item => !idsToDelete.includes(item.id))
+      data = data.filter((item: { id: string }) => !idsToDelete.includes(item.id))
       const deletedCount = initialLength - data.length
 
-      if (deletedCount === 0) {
-        return c.json({
-          success: false,
-          msg: 'No matching reminders found for deletion'
-        }, 404 )
-      }
+      if (deletedCount === 0) { return c.json({ success: false, msg: 'No matching reminders found for deletion' }, 404) }
 
-      await c.env.API.put('reminders.json', JSON.stringify(data), {
-        httpMetadata: { contentType: 'application/json' }
-      })
+      await c.env.API.put('reminders.json', JSON.stringify(data), { httpMetadata: { contentType: 'application/json' } })
 
       if (deletedCount === 1 ) {
         return c.json({ success: true, msg: `reminder '${query.id}' successfully deleted` }, 200)

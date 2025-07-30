@@ -4,7 +4,6 @@ import { Str, Num, Arr, Obj } from 'chanfana'
 export const SonaArtSchema = Arr({
   artist: Str,
   artisturl: Str,
-  platform: Str,
   file: Str,
   date: Str
 })
@@ -34,7 +33,7 @@ export const WeatherSchema = Obj({
     deg: Num,
     gust: Num
   },
-  rain: { "1h": Num },
+  rain: { '1h': Num },
   clouds: { all: Num },
   dt: Num,
   sys: {
@@ -49,11 +48,6 @@ export const WeatherSchema = Obj({
   name: Str,
   cod: Num
 })
-export type weatherData = {
-  coord: { lat: number, lon: number }
-  id: number
-  name: string
-}
 
 export const FortographySchema = Arr({
   char: Str,
@@ -65,5 +59,3 @@ export const RemindersSchema = Arr({
   details: Arr(Str).optional,
   id: Str
 })
-
-export const LyricSchema = Arr(Str)
