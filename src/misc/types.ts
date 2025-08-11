@@ -1,11 +1,12 @@
-import { Str, Num, Arr, Obj } from 'chanfana'
+import { Str, Num, Arr, Obj, Bool } from 'chanfana'
 
 
 export const SonaArtSchema = Arr({
   artist: Str,
   artisturl: Str,
   file: Str,
-  date: Str
+  date: Str,
+  fraeky: Bool
 })
 
 export const WeatherSchema = Obj({

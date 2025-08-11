@@ -1,16 +1,10 @@
-/**
- * For more details on how to configure Wrangler, refer to:
- * https://developers.cloudflare.com/workers/wrangler/configuration/
- */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "newapi",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-04-16",
 	"compatibility_flags": [ "nodejs_compat" ],
-	"observability": {
-		"enabled": true
-	},
+	"observability": { "enabled": true },
 	"r2_buckets": [
 		{
 			"binding": "API",
