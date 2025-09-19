@@ -50,11 +50,6 @@ export const WeatherSchema = Obj({
   cod: Num
 })
 
-export const FortographySchema = Arr({
-  char: Str,
-  names: Arr(Str)
-})
-
 export const RemindersSchema = Arr({
   txt: Str,
   details: Arr(Str).optional,
