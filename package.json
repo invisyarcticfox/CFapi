@@ -12,6 +12,7 @@
 		"@atproto/api": "^0.15.26",
 		"chanfana": "^2.8.1",
 		"hono": "^4.8.5",
+		"rss-parser": "^3.13.0",
 		"zod": "^4.0.5"
 	},
 	"devDependencies": {

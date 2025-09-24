@@ -55,3 +55,22 @@ export const RemindersSchema = Arr({
   details: Arr(Str).optional,
   id: Str
 })
+
+export const LetterboxdSchema = Obj({
+  items: Arr({
+    creator: Str,
+    title: Str,
+    link: Str,
+    pubDate: Str,
+    "dc:creator": Str,
+    content: Str,
+    contentSnippet: Str,
+    guid: Str,
+    isoDate: Str
+  }),
+  feedUrl: Str,
+  paginationLinks: { self: Str },
+  title: Str,
+  description: Str,
+  link: Str
+})
