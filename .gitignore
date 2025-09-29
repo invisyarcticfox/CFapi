@@ -4,3 +4,6 @@ package-lock.json
 *.vars
 
 src/endpoints/dummyEndpoint.ts
+src/endpoints/tasks/
+
+.vscode/
