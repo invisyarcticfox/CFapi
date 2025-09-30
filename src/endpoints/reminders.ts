@@ -18,15 +18,15 @@ export class getReminders extends OpenAPIRoute {
       },
       '204': {
         description: 'Valid JSON file but is empty',
-        ...contentJson([Str])
+        ...contentJson([null])
       },
       '404': {
         description: 'File Not Found',
-        ...contentJson({ success: Bool, error: Str })
+        ...contentJson({ success: Bool({example:'false'}), error: Str({example:'File Not Found'}) })
       },
       '500': {
         description: 'Internal Server Error',
-        ...contentJson({ success: Bool, error: Str })
+        ...contentJson({ success: Bool({example:'false'}), error: Str({example:'Internal Server Error'}) })
       }
     }
   }
@@ -58,23 +58,23 @@ export class addReminders extends OpenAPIRoute {
     responses: {
       '201': {
         description: 'Success',
-        ...contentJson({ success: Bool, msg: Str })
+        ...contentJson({ success: Bool, error: Str({example:'Success'}) })
       },
       '400': {
         description: 'Malformed BODY request',
-        ...contentJson({ success: Bool, error: Str })
+        ...contentJson({ success: Bool({example:'false'}), error: Str({example:'Malformed BODY'}) })
       },
       '401': {
         description: 'Unauthorised',
-        ...contentJson({ success: Bool, error: Str })
+        ...contentJson({ success: Bool({example:'false'}), error: Str({example:'Unauthorised'}) })
       },
       '404': {
         description: 'File Not Found',
-        ...contentJson({ success: Bool, error: Str })
+        ...contentJson({ success: Bool({example:'false'}), error: Str({example:'File Not Found'}) })
       },
       '500': {
         description: 'Internal Server Error',
-        ...contentJson({ success: Bool, error: Str })
+        ...contentJson({ success: Bool({example:'false'}), error: Str({example:'Internal Server Error'}) })
       }
     }
   }
@@ -87,8 +87,8 @@ export class addReminders extends OpenAPIRoute {
 
       if (!Array.isArray(req)) { return c.json({ success: false, error: 'Array expected' }, 400 ) }
 
-      const result = req.map(item => ({
-        ...item,
+      const result = req.map(res => ({
+        ...res,
         id: generateId()
       }))
 
@@ -110,26 +110,30 @@ export class deleteReminders extends OpenAPIRoute {
   public schema = {
     tags: ['Reminders'],
     summary: 'Delete reminders, if any',
+    request: {
+      query: Obj({ id: Str({example:'sjas9a6v'}) }),
+      headers: Obj({ Authorization: Str({example:'Bearer something'}) })
+    },
     responses: {
       '200': {
         description: 'Successfully deleted',
-        ...contentJson({ success: Bool, msg: Str })
+        ...contentJson({ success: Bool, error: Str({example:'Successfully deleted'}) })
       },
       '400': {
         description: 'Incorrect query parameter',
-        ...contentJson({ success: Bool, error: Str })
+        ...contentJson({ success: Bool({example:'false'}), error: Str({example:'Incorrect query parameter'}) })
       },
       '401': {
         description: 'Unauthorised',
-        ...contentJson({ success: Bool, error: Str })
+        ...contentJson({ success: Bool({example:'false'}), error: Str({example:'Unauthorised'}) })
       },
       '404': {
         description: 'File Not Found',
-        ...contentJson({ success: Bool, error: Str })
+        ...contentJson({ success: Bool({example:'false'}), error: Str({example:'File Not Found'}) })
       },
       '500': {
         description: 'Internal Server Error',
-        ...contentJson({ success: Bool, error: Str })
+        ...contentJson({ success: Bool({example:'false'}), error: Str({example:'Internal Server Error'}) })
       }
     }
   }
@@ -137,7 +141,28 @@ export class deleteReminders extends OpenAPIRoute {
   public async handle(c:AppContext) {
     try {
       if (!checkAuth(c)) { return c.json({ success: false, error: 'Unauthorised' }, 401 ) }
-      // maybe fix this one day, perpetual 404
+      
+      const query = c.req.query()
+      if (!query.id || !query.id.trim() ) { return c.json({ success: false, error: 'Incorrect \'ID\' parameter.' }, 400 ) }
+      
+      const deleteIds = query.id.split(',').map(id => id.trim())
+
+      const res = await c.env.API.get('reminders.json')
+      if (!res) { return c.json({ success: false, error: 'File Not Found' }, 404 ) }
+      let data:Reminders[] = await res.json()
+
+      if (!Array.isArray(data)) { data = [] }
+
+      const initLength = data.length
+      data = data.filter(item => !deleteIds.includes(item.id))
+      const deleteCount = initLength - data.length
+
+      await c.env.API.put('reminders.json', JSON.stringify(data), { httpMetadata: { contentType: 'application/json' } } )
+
+      if (deleteCount === 0) { return c.json({ success: false, msg: 'No matching reminders found for deletion' }, 404) }
+      
+      const plural = deleteCount > 1 ? 'reminders' : 'reminder'
+      return c.json({ success: true, msg: `${plural} '${query.id}' successfully deleted` }, 200)
     } catch (error) {
       console.error(error)
       return c.json({ success: false, error: 'Internal Server Error' }, 500 )

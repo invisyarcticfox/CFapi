@@ -20,11 +20,11 @@ export class getPlanes extends OpenAPIRoute {
       },
       '404': {
         description: 'File Not Found',
-        ...contentJson({ success: Bool().openapi({example: false}), error: Str })
+        ...contentJson({ success: Bool({example:'false'}), error: Str({example:'File Not Found'}) })
       },
       '500': {
         description: 'Internal Server Error',
-        ...contentJson({ success: Bool().openapi({example: false}), error: Str })
+        ...contentJson({ success: Bool({example:'false'}), error: Str({example:'Internal Server Error'}) })
       }
     },
   }

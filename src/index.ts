@@ -2,9 +2,8 @@ import { ApiException, fromHono } from 'chanfana'
 import { Hono } from 'hono'
 import { ContentfulStatusCode } from 'hono/utils/http-status'
 
-import { DummyEndpoint } from './endpoints/dummyEndpoint'
 import { getSonaArt } from './endpoints/sonaart'
-// import { addReminders, deleteReminders, getReminders } from './endpoints/reminders'
+import { addReminders, deleteReminders, getReminders } from './endpoints/reminders'
 import { getLetterboxd } from './endpoints/letterboxd'
 import { getPlanes } from './endpoints/jetspotter'
 
@@ -30,6 +29,10 @@ const openapi = fromHono(app, {
 
 
 openapi.get('/sonaart', getSonaArt)
+
+openapi.get('/reminders', getReminders)
+openapi.put('/reminders', addReminders)
+openapi.delete('/reminders', deleteReminders)
 
 openapi.get('/letterboxd', getLetterboxd)
 
