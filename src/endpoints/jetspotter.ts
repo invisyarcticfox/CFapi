@@ -1,4 +1,4 @@
-import { contentJson, OpenAPIRoute, Obj, Str, Arr, Bool, Num } from 'chanfana'
+import { contentJson, OpenAPIRoute, Obj, Str, Bool, Num } from 'chanfana'
 import type { AppContext, Jetspotter } from '../types'
 
 

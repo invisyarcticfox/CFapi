@@ -12,13 +12,13 @@ export class getReminders extends OpenAPIRoute {
         description: 'Valid JSON file with reminders',
         ...contentJson([{
           txt: Str,
-          details: Arr(Str).optional,
+          details: Arr(Str,{required:false}),
           id: Str,
         }])
       },
       '204': {
         description: 'Valid JSON file but is empty',
-        ...contentJson([null])
+        ...contentJson([0])
       },
       '404': {
         description: 'File Not Found',
@@ -52,16 +52,16 @@ export class addReminders extends OpenAPIRoute {
     request: {
       body: contentJson([{
         txt: Str,
-        details: Arr(Str).optional
+        details: Arr(Str,{required:false})
       }])
     },
     responses: {
       '201': {
         description: 'Success',
-        ...contentJson({ success: Bool, error: Str({example:'Success'}) })
+        ...contentJson({ success: Bool, msg: Str({example:'Success'}) })
       },
       '400': {
-        description: 'Malformed BODY request',
+        description: 'Malformed BODY',
         ...contentJson({ success: Bool({example:'false'}), error: Str({example:'Malformed BODY'}) })
       },
       '401': {
@@ -92,12 +92,12 @@ export class addReminders extends OpenAPIRoute {
         id: generateId()
       }))
 
-      await c.env.API.put('reminders.json', JSON.stringify(result), { httpMetadata: { contentType: 'application/json' } })
+      await c.env.API.put('reminders.json', JSON.stringify(result), { httpMetadata: { contentType: 'application/json' } } )
 
       if (req.length === 1 ) {
-        return c.json({ success: true, msg: 'Reminder successfully added' }, 201)
+        return c.json({ success: true, msg: 'Reminder successfully added' }, 201 )
       } else {
-        return c.json({ success: true, msg: 'Reminders successfully added' }, 201)
+        return c.json({ success: true, msg: 'Reminders successfully added' }, 201 )
       }
     } catch (error) {
       console.error(error)
@@ -117,7 +117,7 @@ export class deleteReminders extends OpenAPIRoute {
     responses: {
       '200': {
         description: 'Successfully deleted',
-        ...contentJson({ success: Bool, error: Str({example:'Successfully deleted'}) })
+        ...contentJson({ success: Bool, msg: Str({example:'Successfully deleted'}) })
       },
       '400': {
         description: 'Incorrect query parameter',

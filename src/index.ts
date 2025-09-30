@@ -6,6 +6,7 @@ import { getSonaArt } from './endpoints/sonaart'
 import { addReminders, deleteReminders, getReminders } from './endpoints/reminders'
 import { getLetterboxd } from './endpoints/letterboxd'
 import { getPlanes } from './endpoints/jetspotter'
+import { postSubway } from './endpoints/subway'
 
 
 const app = new Hono<{ Bindings: Env }>()
@@ -35,6 +36,8 @@ openapi.put('/reminders', addReminders)
 openapi.delete('/reminders', deleteReminders)
 
 openapi.get('/letterboxd', getLetterboxd)
+
+openapi.post('/subway', postSubway)
 
 openapi.get('/jetspotter', getPlanes)
 
