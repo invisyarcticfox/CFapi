@@ -17,3 +17,12 @@ export type Reminders = {
   details?: Array<string>
   id: string
 }
+
+export type Jetspotter = {
+  reg: {
+    type: string
+    operator: string
+    seenCount: number
+    lastSeen: string
+  }
+}

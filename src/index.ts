@@ -4,8 +4,9 @@ import { ContentfulStatusCode } from 'hono/utils/http-status'
 
 import { DummyEndpoint } from './endpoints/dummyEndpoint'
 import { getSonaArt } from './endpoints/sonaart'
-import { addReminders, deleteReminders, getReminders } from './endpoints/reminders'
+// import { addReminders, deleteReminders, getReminders } from './endpoints/reminders'
 import { getLetterboxd } from './endpoints/letterboxd'
+import { getPlanes } from './endpoints/jetspotter'
 
 
 const app = new Hono<{ Bindings: Env }>()
@@ -29,7 +30,10 @@ const openapi = fromHono(app, {
 
 
 openapi.get('/sonaart', getSonaArt)
+
 openapi.get('/letterboxd', getLetterboxd)
+
+openapi.get('/jetspotter', getPlanes)
 
 
 export default app

@@ -32,7 +32,7 @@ export class getLetterboxd extends OpenAPIRoute {
       },
       '500': {
         description: 'Internal Server Error',
-        ...contentJson({ success: Bool, error: Str })
+        ...contentJson({ success: Bool().openapi({example: false}), error: Str })
       }
     }
   }

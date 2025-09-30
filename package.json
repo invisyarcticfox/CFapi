@@ -6,6 +6,7 @@
 		"cf-typegen": "wrangler types",
 		"deploy": "wrangler deploy",
 		"dev": "wrangler dev",
+		"remote": "wranger dev --remote",
 		"schema": "npx chanfana"
 	},
 	"dependencies": {
